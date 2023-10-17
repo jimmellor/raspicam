@@ -1,30 +1,11 @@
-#!/usr/bin/python3
-
-import socket
+from picamera2.outputs import FfmpegOutput
+from picamera2 import Picamera2
 import time
 
-from picamera2 import Picamera2
-from picamera2.encoders import H264Encoder
-from picamera2.outputs import FileOutput
-
 picam2 = Picamera2()
-video_config = picam2.create_video_configuration({"size": (1280, 720)})
+video_config = picam2.video_configuration({"size": (640, 480)})
 picam2.configure(video_config)
-encoder = H264Encoder(1000000)
-
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock.bind(("0.0.0.0", 10001))
-    sock.listen()
-
-    picam2.encoders = encoder
-
-    conn, addr = sock.accept()
-    stream = conn.makefile("wb")
-    encoder.output = FileOutput(stream)
-    picam2.start_encoder(encoder)
-    picam2.start()
-    time.sleep(20)
-    picam2.stop()
-    picam2.stop_encoder()
-    conn.close()
+encoder = H264Encoder(bitrate=1000000, repeat=True, iperiod=15)
+output = FfmpegOutput("-f hls -hls_time 4 -hls_list_size 5 -hls_flags delete_segments -hls_allow_cache 0 stream.m3u8")
+picam2.start_recording(encoder, output)
+time.sleep(9999999)
