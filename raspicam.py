@@ -10,10 +10,10 @@ from picamera2.outputs import FileOutput
 
 lsize = (320, 240)
 picam2 = Picamera2()
-video_config = picam2.create_video_configuration(main={"size": (1280, 720), "format": "RGB888"},
+video_config = picam2.create_video_configuration(main={"size": (1920, 1080), "format": "RGB888"},
                                                  lores={"size": lsize, "format": "YUV420"})
 picam2.configure(video_config)
-encoder = H264Encoder(1000000)
+encoder = H264Encoder(40000000)
 picam2.encoder = encoder
 picam2.start()
 
@@ -37,7 +37,7 @@ while True:
                 print("New Motion", mse)
             ltime = time.time()
         else:
-            if encoding and time.time() - ltime > 2.0:
+            if encoding and time.time() - ltime > 10.0:
                 picam2.stop_encoder()
                 encoding = False
     prev = cur
