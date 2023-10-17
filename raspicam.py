@@ -32,7 +32,7 @@ while True:
         if mse > 7:
             if not encoding:
                 encoder.output = FileOutput(f"{int(time.time())}.h264")
-                picam2.start_encoder()
+                picam2.start_encoder(encoder)
                 encoding = True
                 print("New Motion", mse)
             ltime = time.time()
